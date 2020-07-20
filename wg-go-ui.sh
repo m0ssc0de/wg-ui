@@ -2,6 +2,10 @@ set -eux
 
 #!/bin/bash
 
+
+mkdir /dev/net
+mknod /dev/net/tun c 10 200
+
 # Start the first process
 ./wireguard-go wg0
 status=$?
