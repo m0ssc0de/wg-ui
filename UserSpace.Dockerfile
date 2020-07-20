@@ -17,11 +17,17 @@ COPY --from=ui /ui/dist ui/dist
 RUN go-bindata-assetfs -prefix ui/dist ui/dist
 RUN go install .
 
-FROM golang AS go_build
+FROM docker.io/golang:1.14 AS wg-go-build
 WORKDIR /wg-go
-RUN git clone https://git.zx2c4.com/wireguard-go && cd wireguard-go && make
+RUN git init && \
+    git remote add origin https://git.zx2c4.com/wireguard-go && \
+    git fetch && \
+    git checkout tags/v0.0.20200320 -b build && \
+    make
 
-FROM gcr.io/distroless/base
+FROM alpine:3.12
+RUN apk add libc6-compat --no-cache
+COPY ./wg-go-ui.sh /
 COPY --from=build /go/bin/wireguard-ui /
 COPY --from=go_build /wg-go/wireguard-go /
-ENTRYPOINT [ "/wireguard-ui" ]
+ENTRYPOINT [ "/bin/sh", "-c", "/wg-go-ui.sh" ]

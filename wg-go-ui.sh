@@ -3,18 +3,18 @@ set -eux
 #!/bin/bash
 
 # Start the first process
-./my_first_process -D
+./wireguard-go wg0
 status=$?
 if [ $status -ne 0 ]; then
-  echo "Failed to start my_first_process: $status"
+  echo "Failed to start wireguard-go: $status"
   exit $status
 fi
 
 # Start the second process
-./my_second_process -D
+./wireguard-ui $@
 status=$?
 if [ $status -ne 0 ]; then
-  echo "Failed to start my_second_process: $status"
+  echo "Failed to start wireguard-ui: $status"
   exit $status
 fi
 
@@ -25,9 +25,9 @@ fi
 # Otherwise it loops forever, waking up every 60 seconds
 
 while sleep 60; do
-  ps aux |grep my_first_process |grep -q -v grep
+  ps aux |grep wireguard-go |grep -q -v grep
   PROCESS_1_STATUS=$?
-  ps aux |grep my_second_process |grep -q -v grep
+  ps aux |grep wireguard-ui |grep -q -v grep
   PROCESS_2_STATUS=$?
   # If the greps above find anything, they exit with 0 status
   # If they are not both 0, then something is wrong
@@ -36,4 +36,3 @@ while sleep 60; do
     exit 1
   fi
 done
-
