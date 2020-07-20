@@ -1,8 +1,10 @@
+#!/bin/sh
+
 set -eux
 
-#!/bin/bash
+echo "-->" $@
 
-
+# need `SYS_ADMIN` and `NET_ADMIN` capabilities.
 mkdir /dev/net
 mknod /dev/net/tun c 10 200
 
